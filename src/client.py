@@ -150,8 +150,6 @@ def main():
 
     game = client.receive()
     player = game.get_player()
-    print(game)
-    print(player.mark)
 
     game_on = True
     while game_on:

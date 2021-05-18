@@ -154,7 +154,7 @@ class Server(Network):
                     else:
                         self.send(game, clients[-1])
 
-            except StopIteration:
+            except:
                 print("[ERROR] Something is fishy")
 
     def _create_board(self):
