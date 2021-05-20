@@ -5,27 +5,29 @@
 """
 
 import sys
+from random import choice
 import pygame
 from src.classes import Network
 pygame.font.init()
 
 # Setup the main window
-SIDE, MARGIN = 150, 0
+SIDE, MARGIN = 150, 2
 WIDTH, HEIGHT = 3 * SIDE, 600
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Tic Tac Toe")
 
 # Setup Clock()
-FPS = 60
+FPS = 30
 CLOCK = pygame.time.Clock()
 
-# Setup Font
-FONT = pygame.font.SysFont("Secular One", 200)
+# Setup MARK
+MARK = pygame.font.SysFont("Secular One", 200)
+DETAILS_FONT = pygame.font.SysFont("Secular One", 100)
 
 # Colors
-WHITE = (255, 255, 255)
-GREEN = (0, 200, 55)
-BLACK = (10, 10, 10)
+BACK = (0, 240, 230)
+MARKS = (30, 30, 30)
+LINES = (50, 50, 50)
 
 # Some useful comment
 client = Network(server=False)
@@ -37,23 +39,30 @@ def draw_board():
     # COLUMNS
     x, y = 0, MARGIN
     for _ in range(4):
-        pygame.draw.line(WIN, BLACK, (x, y),
+        pygame.draw.line(WIN, LINES, (x, y),
                         (x, HEIGHT - (HEIGHT - WIDTH - MARGIN)), 9)
         x += SIDE
 
     # ROWS
     x, y = 0, MARGIN
     for _ in range(4):
-        pygame.draw.line(WIN, BLACK, (x, y), (WIDTH, y), 9)
+        pygame.draw.line(WIN, LINES, (x, y), (WIDTH, y), 9)
         y += SIDE
+    
+    # DETAILS
+    # x, y = (WIDTH / 2 - 9 / 5), (y - SIDE)
+    # pygame.draw.line(WIN, LINES, (x, y), 
+    #                 (x, y + (SIDE / 2) - 15), 9)
+    # pygame.draw.rect(WIN, LINES, ())
 
 
-def update_board(board):
+def update_board(board, game):
     """Place marks on the board"""
-    MARK_O = FONT.render(" o", 1, GREEN)
-    MARK_X = FONT.render(" x", 1, GREEN)
-    DEFAULT = FONT.render("", 1, GREEN)
+    MARK_O = MARK.render(" o", 1, MARKS)
+    MARK_X = MARK.render(" x", 1, MARKS)
+    DEFAULT = MARK.render("", 1, MARKS)
 
+    # MARKS
     for i in board:
         for j in i:
             if j[0] == "o":
@@ -62,6 +71,14 @@ def update_board(board):
                 WIN.blit(MARK_X, j[1])
             else:
                 WIN.blit(DEFAULT, j[1])
+    
+    # DETAILS
+    if game.whose_turn:
+        TURN = DETAILS_FONT.render(f"  {game.whose_turn.title()}'s   MOVE", 1, MARKS)
+    else:
+        TURN = DETAILS_FONT.render(f"  WAITING...", 1, MARKS)
+    
+    WIN.blit(TURN, (0, SIDE*3 + 9 + 30))
 
 
 def check_if_won(board, player):
@@ -116,15 +133,11 @@ def check_if_won(board, player):
          and marks[2][0] == player.mark))
 
 
-def get_new_data():
-    """Get new data"""
-
-
-def draw(board):
+def draw(board, game):
     """Draw the things"""
-    WIN.fill(WHITE)
+    WIN.fill(BACK)
     draw_board()
-    update_board(board)
+    update_board(board, game)
     pygame.display.update()
     CLOCK.tick(FPS)
 
@@ -172,45 +185,64 @@ def main():
                 pygame.quit()
                 sys.exit()
 
-            if event.type == pygame.MOUSEBUTTONUP and len(game.players) == 2:
-                pos = pygame.mouse.get_pos()
+            if len(game.players) == 2:
+                if event.type == pygame.MOUSEBUTTONUP \
+                and game.whose_turn == player.mark:
+                    pos = pygame.mouse.get_pos()
 
-                x, y = pos
+                    x, y = pos
 
-                # Find the clicked box
-                if x in range(SIDE):
-                    j = 0
-                elif x in range(SIDE, 2*SIDE):
-                    j = 1
-                else:
-                    j = 2
+                    # Find the clicked box
+                    if x in range(SIDE):
+                        j = 0
+                    elif x in range(SIDE, 2*SIDE):
+                        j = 1
+                    else:
+                        j = 2
 
-                if y in range(SIDE):
-                    i = 0
-                elif y in range(SIDE, 2*SIDE):
-                    i = 1
-                else:
-                    i = 2
+                    if y in range(SIDE):
+                        i = 0
+                    elif y in range(SIDE, 2*SIDE):
+                        i = 1
+                    else:
+                        i = 2
 
-                # Update board
-                if not game.board[i][j][0]:
-                    game.board[i][j][0] = player.mark
+                    # Update board
+                    if not game.board[i][j][0]:
+                        game.board[i][j][0] = player.mark
+                        game.whose_turn = opponent.mark
+                        game.moves += 1
 
         if len(game.players) == 2:
+
             client.send(game)
             game = client.receive()
+            players = game.players
+
+            if not game.whose_turn:
+                try:
+                    opponent = players[0] if player != players[0] else players[1]
+                except:
+                    continue
+                game.whose_turn = choice(["o", "x"])
 
             # Update window
-            draw(game.board)
+            draw(game.board, game)
 
             if check_if_won(game.board, player):
                 print(player, "won!")
                 game.board = create_board()   # FOR NOW: It creates a new board
+            else:
+                if game.moves == 9:
+                    print("DRAW!")
+                    game.board = create_board()
         else:
+            game.moves = 0
+            game.whose_turn = None
             client.send(game)
             game = client.receive()
 
-            draw(game.board)
+            draw(game.board, game)
 
 
 if __name__ == "__main__":

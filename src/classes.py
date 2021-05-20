@@ -6,7 +6,7 @@ import socket
 import pickle
 
 
-class Network():
+class Network:
     """Handle sockets"""
 
     def __init__(self, server=False):
@@ -34,12 +34,25 @@ class Network():
         return f"<Network => Client>"
 
 
-class Player():
+class Player:
     """Handle a player"""
+
+    __slots__ = ["id",
+                 "mark",
+                 "score"]
 
     def __init__(self, id, mark):
         self.id = id
         self.mark = mark
+        self.score = 0
+
+    def __eq__(self, other):
+        return self.id == other.id
+    
+    # def __str__(self) -> str:
+    #     string = f"""PLAYER - {self.mark}"""
+
+    #     return string
 
     def __repr__(self):
         return f"Player({self.id}, {self.mark})"
@@ -48,11 +61,20 @@ class Player():
 class Game:
     """Game class"""
 
+    __slots__ = ["id",
+                 "board",
+                 "players",
+                 "matching",
+                 "whose_turn",
+                 "moves"]
+
     def __init__(self, id, board) -> None:
         self.id = id
         self.board = board
         self.players = []
         self.matching = []
+        self.whose_turn = None
+        self.moves = 0
 
     def get_player(self) -> Player:
         """Grab a player"""
@@ -68,21 +90,27 @@ class Game:
 
     def rem_player(self, mark) -> bool:
         """Remove a player"""
-
         for player in self.players:
             if player.mark == mark:
                 self.players.remove(player)
                 self.matching.remove(player)
-                print(f"[STATUS] {player} removed!")
+                print(f"[STATUS] {repr(player)} removed!")
                 return True
         return False
+    
+    def __eq__(self, other):
+        return self.id == other.id
 
+    # def __str__(self) -> str:
+    #     if len(self.players) == 2:
+    #         string = f"""{self.players[0]}   {self.players[1]}
+    #         """
+    #     else:
+    #         string = f"""
+    #         {self.players[0]}
+    #         """
+        
+    #     return string
+    
     def __repr__(self) -> str:
-        string = f"""
-        ------------------
-        Game: {self.id}
-        Players:
-        {self.players}
-        ------------------
-        """
-        return string
+        return f"Game({self.id}, {self.board})"

@@ -28,7 +28,7 @@ class Server(Network):
 
         while True:
             conn, addr = self._server.accept()
-            print(f"[CONNECTION] Connected to Client {addr}")
+            print(f"[NEW CONNECTION] Connected to Client {addr}")
 
             # Add client to a new game if their are
             # even number of players
@@ -46,7 +46,7 @@ class Server(Network):
                 game.players.append(Player(index, mark))
 
                 # Update the game_dict and add it to self._games
-                game_dict["game"], game_dict["clients"] = game, [conn]
+                game_dict["game"], game_dict["clients"] = game, [(conn, addr)]
                 self._games.append(game_dict)
 
             # Otherwise, add client to the game with a single player
@@ -71,15 +71,15 @@ class Server(Network):
                 game_dict["game"].players.insert(index, Player(index, mark))
 
                 # Add the client to the clients list
-                game_dict["clients"].insert(index, conn)
+                game_dict["clients"].insert(index, (conn, addr))
 
             # Update the clients counter
             self._num_clients += 1
 
             # Create a new thread for the client
             thread = threading.Thread(target=self._handle_client,
-                                      args=(conn, game_dict),
-                                      daemon=True)
+                                    args=(conn, game_dict),
+                                    daemon=True)
             thread.start()
 
     def _handle_client(self, conn, game_dict):
@@ -88,14 +88,11 @@ class Server(Network):
 
         # to_remove = False
         game_on = True
-        to_close = None
         while game_on:
             try:
-                if to_close:
-                    to_close.close()
-                    to_close = None
 
                 data = self.receive(conn)
+
 
                 if data:
 
@@ -106,23 +103,24 @@ class Server(Network):
                             game = updated_game
 
                             if len(game.players) == 1:
+                                game.board = self._create_board()
+
                                 if game.players[-1].mark == "x":
-                                    self.send(game, clients[1])
-                                    print(f"[DISCONNECTED] {clients[0]}")
-                                    to_close = clients[0]
+                                    self.send(game, clients[1][0])
+                                    print(f"[DISCONNECTED] {clients[0][1]}")
                                     clients.remove(clients[0])
                                     self._num_clients -= 1
 
                                 else:
-                                    self.send(game, clients[0])
-                                    print(f"[DISCONNECTED] {clients[1]}")
-                                    to_close = clients[1]
+                                    self.send(game, clients[0][0])
+                                    print(f"[DISCONNECTED] {clients[1][1]}")
                                     clients.remove(clients[1])
                                     self._num_clients -= 1
 
+                                break
+
                             else:
-                                print(f"[DISCONNECTED] {clients[-1]}")
-                                to_close = clients[-1]
+                                print(f"[DISCONNECTED] {clients[-1][1]}")
                                 clients.remove(clients[-1])
                                 self._num_clients -= 1
                                 for _game in self._games:
@@ -148,14 +146,14 @@ class Server(Network):
 
                     # Send the game to the players
                     if len(game.players) == 2:
-                        for client in clients:
+                        for client, _ in clients:
                             if client != conn:
                                 self.send(game, client)
                     else:
-                        self.send(game, clients[-1])
-
+                        self.send(game, clients[-1][0])
+                    
             except:
-                print("[ERROR] Something is fishy")
+                print("[ERROR] Unknown Error Occurred!")
 
     def _create_board(self):
         """Create a new board"""
