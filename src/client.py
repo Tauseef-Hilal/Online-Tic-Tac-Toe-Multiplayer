@@ -236,6 +236,7 @@ def main():
                 if game.moves == 9:
                     print("DRAW!")
                     game.board = create_board()
+                    game.moves = 0
         else:
             game.moves = 0
             game.whose_turn = None
