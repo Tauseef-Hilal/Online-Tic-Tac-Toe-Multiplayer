@@ -30,9 +30,29 @@ class Server(Network):
             conn, addr = self._server.accept()
             print(f"[NEW CONNECTION] Connected to Client {addr}")
 
-            # Add client to a new game if their are
-            # even number of players
-            if self._num_clients % 2 == 0:
+            # Iterate through self._games and find
+            # the game with a single player
+            for game_dict in self._games:
+                if len(game_dict["game"].players) % 2 == 0:
+                    continue
+                else:
+                    # Grab the existing player and
+                    # figure out what index and mark
+                    # the new player should have
+                    existing_player = game_dict["game"].players[-1]
+                    if existing_player.mark == "o":
+                        index, mark = 1, "x"
+                    else:
+                        index, mark = 0, "o"
+
+                    # Insert player to the game's list
+                    game_dict["game"].players.insert(index, Player(index, mark))
+
+                    # Add the client to the clients list
+                    game_dict["clients"].insert(index, (conn, addr))
+                    break
+            else:
+                # Add client to a new game
                 # Create a dict for the game
                 game_dict = {"game": None,
                              "clients": None}
@@ -48,30 +68,6 @@ class Server(Network):
                 # Update the game_dict and add it to self._games
                 game_dict["game"], game_dict["clients"] = game, [(conn, addr)]
                 self._games.append(game_dict)
-
-            # Otherwise, add client to the game with a single player
-            else:
-
-                # Iterate through self._games and find
-                # the game with a single player
-                for game_dict in self._games:
-                    if len(game_dict["game"].players) == 1:
-                        break
-
-                # Grab the existing player and
-                # figure out what index and mark
-                # the new player should have
-                existing_player = game_dict["game"].players[-1]
-                if existing_player.mark == "o":
-                    index, mark = 1, "x"
-                else:
-                    index, mark = 0, "o"
-
-                # Insert player to the game's list
-                game_dict["game"].players.insert(index, Player(index, mark))
-
-                # Add the client to the clients list
-                game_dict["clients"].insert(index, (conn, addr))
 
             # Update the clients counter
             self._num_clients += 1
