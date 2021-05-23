@@ -22,7 +22,7 @@ CLOCK = pygame.time.Clock()
 
 # Setup MARK
 MARK = pygame.font.SysFont("Secular One", 200)
-DETAILS_FONT = pygame.font.SysFont("Secular One", 100)
+DETAILS_FONT = pygame.font.SysFont("Secular One", 60)
 
 # Colors
 BACK = (0, 240, 230)
@@ -56,7 +56,7 @@ def draw_board():
     # pygame.draw.rect(WIN, LINES, ())
 
 
-def update_board(board, game):
+def update_board(board, game, player):
     """Place marks on the board"""
     MARK_O = MARK.render(" o", 1, MARKS)
     MARK_X = MARK.render(" x", 1, MARKS)
@@ -74,11 +74,14 @@ def update_board(board, game):
     
     # DETAILS
     if game.whose_turn:
-        TURN = DETAILS_FONT.render(f"  {game.whose_turn.title()}'s   MOVE", 1, MARKS)
+        if game.whose_turn == player.mark:
+            TURN = DETAILS_FONT.render(f"         YOUR TURN", 1, MARKS)
+        else:
+           TURN = DETAILS_FONT.render(f"  OPPONENT's TURN", 1, MARKS) 
     else:
-        TURN = DETAILS_FONT.render(f"  WAITING...", 1, MARKS)
+        TURN = DETAILS_FONT.render(f"          WAITING...", 1, MARKS)
     
-    WIN.blit(TURN, (0, SIDE*3 + 9 + 30))
+    WIN.blit(TURN, (0, SIDE*3 + 9 + 40))
 
 
 def check_if_won(board, player):
@@ -133,11 +136,11 @@ def check_if_won(board, player):
          and marks[2][0] == player.mark))
 
 
-def draw(board, game):
+def draw(board, game, player):
     """Draw the things"""
     WIN.fill(BACK)
     draw_board()
-    update_board(board, game)
+    update_board(board, game, player)
     pygame.display.update()
     CLOCK.tick(FPS)
 
@@ -227,7 +230,7 @@ def main():
                 game.whose_turn = choice(["o", "x"])
 
             # Update window
-            draw(game.board, game)
+            draw(game.board, game, player)
 
             if check_if_won(game.board, player):
                 print(player, "won!")
@@ -243,7 +246,7 @@ def main():
             client.send(game)
             game = client.receive()
 
-            draw(game.board, game)
+            draw(game.board, game, player)
 
 
 if __name__ == "__main__":

@@ -112,7 +112,6 @@ class Server(Network):
                                     print(f"[DISCONNECTED] {clients[1][1]}")
                                     clients.remove(clients[1])
                                     self._num_clients -= 1
-
                                 break
 
                             else:
