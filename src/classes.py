@@ -100,17 +100,6 @@ class Game:
     
     def __eq__(self, other):
         return self.id == other.id
-
-    # def __str__(self) -> str:
-    #     if len(self.players) == 2:
-    #         string = f"""{self.players[0]}   {self.players[1]}
-    #         """
-    #     else:
-    #         string = f"""
-    #         {self.players[0]}
-    #         """
-        
-    #     return string
     
     def __repr__(self) -> str:
         return f"Game({self.id}, {self.board})"

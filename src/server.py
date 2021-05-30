@@ -4,7 +4,9 @@
     Server for the project
 """
 
+import time
 import threading
+from pprint import pprint
 from src.classes import (Network,
                          Player,
                          Game)
@@ -20,7 +22,46 @@ class Server(Network):
         self._num_clients = 0
         self._server.bind(self._ADDR)
         print("[STATUS] Server Started!")
-        self._start_listen()
+
+        # Create a new thread to listen
+        listener = threading.Thread(target=self._start_listen,
+                                    daemon=True)
+        listener.start()
+        self._get_cmd()
+    
+    def _get_cmd(self):
+        """Get commands from the user"""
+
+        commands = {"!exit": self._exit,
+                    "!active": self._show_active}
+
+        while True:
+            cmd = input("")
+
+            if cmd in commands:
+                commands[cmd]()
+    
+    def _show_active(self):
+        """Display all active games"""
+        print("="*80)
+
+        for game_dict in self._games:
+            game = game_dict["game"]
+            game_id, board = game.id, game.board
+
+            print(f"Game ID: {game_id}")
+            print("\t\t<Game Board>")
+            pprint(board, depth=3)
+            print()
+
+        print("="*80)
+        print(f"[INFO] Active Games: {len(self._games)}")
+        print(f"[INFO] Active Clients: {self._num_clients}")
+    
+    def _exit(self):
+        """Exit server"""
+        print("[SERVER] Exiting server!")
+        exit(time.sleep(1))
 
     def _start_listen(self):
         print("[SERVER] Waiting for Clients...")
