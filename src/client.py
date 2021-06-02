@@ -84,56 +84,70 @@ def update_board(board, game, player):
     WIN.blit(TURN, (0, SIDE*3 + 9 + 40))
 
 
+# def check_if_won(board, player):
+#     """Check if a player won"""
+
+#     marks = [[y[0] for y in x] for x in board]
+
+#     return ((marks[0][0] == marks[0][1]
+#          and marks[0][1] == marks[0][2]
+#          and marks[0][2] == player.mark)
+
+#                          or
+
+#             (marks[1][0] == marks[1][1]
+#          and marks[1][1] == marks[1][2]
+#          and marks[1][2] == player.mark)
+
+#                          or
+
+#             (marks[2][0] == marks[2][1]
+#          and marks[2][1] == marks[2][2]
+#          and marks[2][2] == player.mark)
+
+#                          or
+
+#             (marks[0][0] == marks[1][0]
+#          and marks[1][0] == marks[2][0]
+#          and marks[2][0] == player.mark)
+
+#                          or
+
+#             (marks[0][1] == marks[1][1]
+#          and marks[1][1] == marks[2][1]
+#          and marks[2][1] == player.mark)
+
+#                          or
+
+#             (marks[0][2] == marks[1][2]
+#          and marks[1][2] == marks[2][2]
+#          and marks[1][2] == player.mark)
+
+#                          or
+
+#             (marks[0][0] == marks[1][1]
+#          and marks[1][1] == marks[2][2]
+#          and marks[2][2] == player.mark)
+
+#                          or
+
+#             (marks[0][2] == marks[1][1]
+#          and marks[1][1] == marks[2][0]
+#          and marks[2][0] == player.mark))
+
 def check_if_won(board, player):
     """Check if a player won"""
 
     marks = [[y[0] for y in x] for x in board]
 
-    return ((marks[0][0] == marks[0][1]
-         and marks[0][1] == marks[0][2]
-         and marks[0][2] == player.mark)
-
-                         or
-
-            (marks[1][0] == marks[1][1]
-         and marks[1][1] == marks[1][2]
-         and marks[1][2] == player.mark)
-
-                         or
-
-            (marks[2][0] == marks[2][1]
-         and marks[2][1] == marks[2][2]
-         and marks[2][2] == player.mark)
-
-                         or
-
-            (marks[0][0] == marks[1][0]
-         and marks[1][0] == marks[2][0]
-         and marks[2][0] == player.mark)
-
-                         or
-
-            (marks[0][1] == marks[1][1]
-         and marks[1][1] == marks[2][1]
-         and marks[2][1] == player.mark)
-
-                         or
-
-            (marks[0][2] == marks[1][2]
-         and marks[1][2] == marks[2][2]
-         and marks[1][2] == player.mark)
-
-                         or
-
-            (marks[0][0] == marks[1][1]
-         and marks[1][1] == marks[2][2]
-         and marks[2][2] == player.mark)
-
-                         or
-
-            (marks[0][2] == marks[1][1]
-         and marks[1][1] == marks[2][0]
-         and marks[2][0] == player.mark))
+    return (marks[0][0] == marks[0][1] == marks[0][2] == player.mark
+        or  marks[1][0] == marks[1][1] == marks[1][2] == player.mark
+        or  marks[2][0] == marks[2][1] == marks[2][2] == player.mark
+        or  marks[0][0] == marks[1][0] == marks[2][0] == player.mark
+        or  marks[0][1] == marks[1][1] == marks[2][1] == player.mark
+        or  marks[0][2] == marks[1][2] == marks[2][2] == player.mark
+        or  marks[0][0] == marks[1][1] == marks[2][2] == player.mark
+        or  marks[0][2] == marks[1][1] == marks[2][0] == player.mark)
 
 
 def draw(board, game, player):
@@ -156,7 +170,7 @@ def create_board():
         for j in range(3):
             x = j*CELL_WIDTH
             board[i].append(0)
-            board[i][j] = ["", (x, y)]
+            board[i][j] = [" ", (x, y)]
 
     return board
 
@@ -211,7 +225,7 @@ def main():
                         i = 2
 
                     # Update board
-                    if not game.board[i][j][0]:
+                    if game.board[i][j][0] == " ":
                         game.board[i][j][0] = player.mark
                         game.whose_turn = opponent.mark
                         game.moves += 1
@@ -224,7 +238,8 @@ def main():
 
             if not game.whose_turn:
                 try:
-                    opponent = players[0] if player != players[0] else players[1]
+                    opponent = players[0] if player != players[0] \
+                                          else players[1]
                 except:
                     continue
                 game.whose_turn = choice(["o", "x"])
@@ -235,6 +250,7 @@ def main():
             if check_if_won(game.board, player):
                 print(player, "won!")
                 game.board = create_board()   # FOR NOW: It creates a new board
+                game.moves = 0
             else:
                 if game.moves == 9:
                     print("DRAW!")

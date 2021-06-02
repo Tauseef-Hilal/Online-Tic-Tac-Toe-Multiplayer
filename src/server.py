@@ -11,8 +11,6 @@ from src.classes import (Network,
                          Player,
                          Game)
 
-# Create server
-
 
 class Server(Network):
 
@@ -40,7 +38,7 @@ class Server(Network):
 
             if cmd in commands:
                 commands[cmd]()
-    
+
     def _show_active(self):
         """Display all active games"""
         print("="*80)
@@ -87,7 +85,8 @@ class Server(Network):
                         index, mark = 0, "o"
 
                     # Insert player to the game's list
-                    game_dict["game"].players.insert(index, Player(index, mark))
+                    game_dict["game"].players.insert(index, 
+                                                     Player(index, mark))
 
                     # Add the client to the clients list
                     game_dict["clients"].insert(index, (conn, addr))
@@ -129,8 +128,7 @@ class Server(Network):
             try:
 
                 data = self.receive(conn)
-
-
+                
                 if data:
 
                     if isinstance(data, list):
@@ -202,7 +200,7 @@ class Server(Network):
             for j in range(3):
                 x = j*CELL_WIDTH
                 board[i].append(0)
-                board[i][j] = ["", (x, y)]
+                board[i][j] = [" ", (x, y)]
 
         return board
 
