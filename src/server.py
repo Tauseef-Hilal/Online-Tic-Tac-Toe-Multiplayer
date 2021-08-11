@@ -26,7 +26,7 @@ class Server(Network):
                                     daemon=True)
         listener.start()
         self._get_cmd()
-    
+
     def _get_cmd(self):
         """Get commands from the user"""
 
@@ -55,7 +55,7 @@ class Server(Network):
         print("="*80)
         print(f"[INFO] Active Games: {len(self._games)}")
         print(f"[INFO] Active Clients: {self._num_clients}")
-    
+
     def _exit(self):
         """Exit server"""
         print("[SERVER] Exiting server!")
@@ -85,7 +85,7 @@ class Server(Network):
                         index, mark = 0, "o"
 
                     # Insert player to the game's list
-                    game_dict["game"].players.insert(index, 
+                    game_dict["game"].players.insert(index,
                                                      Player(index, mark))
 
                     # Add the client to the clients list
@@ -114,21 +114,20 @@ class Server(Network):
 
             # Create a new thread for the client
             thread = threading.Thread(target=self._handle_client,
-                                    args=(conn, game_dict),
-                                    daemon=True)
+                                      args=(conn, game_dict),
+                                      daemon=True)
             thread.start()
 
     def _handle_client(self, conn, game_dict):
         game, clients = game_dict.values()
         self.send(game, conn)
 
-        # to_remove = False
         game_on = True
         while game_on:
             try:
 
                 data = self.receive(conn)
-                
+
                 if data:
 
                     if isinstance(data, list):
@@ -185,7 +184,7 @@ class Server(Network):
                                 self.send(game, client)
                     else:
                         self.send(game, clients[-1][0])
-                    
+
             except:
                 print("[ERROR] Unknown Error Occurred!")
 
@@ -200,7 +199,7 @@ class Server(Network):
             for j in range(3):
                 x = j*CELL_WIDTH
                 board[i].append(0)
-                board[i][j] = [" ", (x, y)]
+                board[i][j] = [" ", (x, y+50)]
 
         return board
 

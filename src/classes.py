@@ -77,7 +77,6 @@ class Game:
             self.matching.append(self.players[-1])
             return self.players[-1]
         else:
-            print(self.players)
             for player in self.players:
                 if player not in self.matching:
                     self.matching.append(player)
@@ -92,9 +91,9 @@ class Game:
                 print(f"[STATUS] {repr(player)} removed!")
                 return True
         return False
-    
+
     def __eq__(self, other) -> bool:
         return self.id == other.id
-    
+
     def __repr__(self) -> str:
         return f"Game({self.id}, {self.board})"
