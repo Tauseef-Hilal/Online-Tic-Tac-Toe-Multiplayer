@@ -63,7 +63,7 @@ class Server(Network):
 
     def _start_listen(self):
         print("[SERVER] Waiting for Clients...")
-        self._server.listen()
+        self._server.listen(5)
 
         while True:
             conn, addr = self._server.accept()

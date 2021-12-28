@@ -7,7 +7,7 @@ __An online multiplayer game: Tic-Tac-Toe.__
 
 
 ## System Requirements
-* **OS**: Any (Tested on Windows)
+* **OS**: Mac and Windows
 * **RAM**: ~ 60MB (Minimum)
 * **ROM**: ~ 30MB
 * ***Python and other dependencies must be installed!***
@@ -26,4 +26,4 @@ __An online multiplayer game: Tic-Tac-Toe.__
 
 
 ## Depends On
-*pygame==2.0.1*
+*pygame==2.1.2*

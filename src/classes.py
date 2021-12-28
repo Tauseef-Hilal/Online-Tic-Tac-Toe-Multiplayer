@@ -11,7 +11,7 @@ class Network:
 
     def __init__(self, server=False) -> None:
         self.is_server = server
-        self._ADDR = ("localhost", 5050)
+        self._ADDR = ("", 5050)
         self._server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         if not self.is_server:

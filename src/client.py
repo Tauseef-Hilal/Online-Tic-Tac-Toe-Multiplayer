@@ -21,9 +21,9 @@ FPS = 30
 CLOCK = pygame.time.Clock()
 
 # Setup MARK
-MARK = pygame.font.SysFont("Secular One", 200)
-DETAILS_FONT = pygame.font.SysFont("Secular One", 60)
-SCORE_FONT = pygame.font.SysFont("Secular One", 50)
+MARK = pygame.font.SysFont("", 200)
+DETAILS_FONT = pygame.font.SysFont("", 60)
+SCORE_FONT = pygame.font.SysFont("", 50)
 
 # Colors
 BACK = (0, 240, 230)
